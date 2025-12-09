@@ -1,16 +1,34 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class Movment : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public float speed = 5f;
+    private Rigidbody rb;
+    private Vector2 moveInput;
+
+    PlayerControls controls;
+
+    void Awake()
     {
-        
+        controls = new PlayerControls();
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnEnable()
     {
-        
+        controls.Enable();
+        controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+        controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
+    }
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
+    void FixedUpdate()
+    {
+        Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
+        rb.MovePosition(transform.position + move * speed * Time.fixedDeltaTime);
     }
 }
